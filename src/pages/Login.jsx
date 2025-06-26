@@ -17,13 +17,22 @@ function Login () {
     };
     
     return (
-        <div>
-            <h2>Login</h2>
+        <>
+            <main className='login-container'>
+                <img src="https://cdn.imagine.art/processed/c9a6ead5-b318-4f6d-9c36-da8e5a7add4a" alt="" className='rigth-side-image' />
+                
+                <section className='login-section'>
+                    <h1>Curriculum Generator</h1>
 
-            <button onClick={handleLogin}>
-                Entrar com Google
-            </button>
-        </div>
+                    <h2>Crie o seu currículo vencedor aqui na <label className='app-name'>Curriculum Generator</label>!</h2>
+
+                    <button onClick={handleLogin}>
+                        Fazer Login
+                    </button>
+                </section>
+            </main>
+        </>
+        
   );
 }
 

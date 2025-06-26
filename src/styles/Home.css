@@ -1,0 +1,149 @@
+.home-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+}
+
+.home-container button {
+    background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+    color: white;
+    border: none;
+    padding: 15px 30px;
+    font-size: 18px;
+    font-weight: 600;
+    border-radius: 50px;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+    margin-bottom: 30px;
+    width: 100%;
+    max-width: 300px;
+}
+
+.home-container button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+
+.home-container button:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.curriculo-form {
+    background: white;
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(10px);
+}
+
+.curriculo-form label {
+    display: block;
+    margin-bottom: 20px;
+    font-weight: 600;
+    color: #333;
+}
+
+.curriculo-form label:not(fieldset label) {
+    font-size: 16px;
+}
+
+.curriculo-form input,
+.curriculo-form textarea {
+    width: 100%;
+    padding: 12px 15px;
+    border: 2px solid #e1e5e9;
+    border-radius: 10px;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    background: #f8f9fa;
+    margin-top: 5px;
+    box-sizing: border-box;
+}
+
+.curriculo-form input:focus,
+.curriculo-form textarea:focus {
+    outline: none;
+    border-color: #667eea;
+    background: white;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.curriculo-form input:disabled,
+.curriculo-form textarea:disabled {
+    background: #f5f5f5;
+    color: #999;
+    cursor: not-allowed;
+}
+
+.curriculo-form textarea {
+    min-height: 100px;
+    resize: none;
+    font-family: inherit;
+}
+
+.curriculo-form fieldset {
+    border: 2px solid #e1e5e9;
+    border-radius: 15px;
+    padding: 25px;
+    margin: 30px 0;
+    background: #f8f9fa;
+}
+
+.curriculo-form fieldset legend {
+    font-size: 18px;
+    font-weight: 700;
+    color: #667eea;
+    padding: 0 15px;
+    background: white;
+    border-radius: 20px;
+}
+
+.curriculo-form fieldset label {
+    margin-bottom: 15px;
+}
+
+.curriculo-form fieldset input[type="checkbox"] {
+    width: auto;
+    margin-right: 10px;
+    margin-top: 0;
+}
+
+.curriculo-form fieldset label:has(input[type="checkbox"]) {
+    display: flex;
+    align-items: center;
+    font-weight: 500;
+}
+
+.curriculo-form button[type="submit"] {
+    background: linear-gradient(45deg, #4CAF50, #45a049);
+    color: white;
+    border: none;
+    padding: 15px 30px;
+    font-size: 16px;
+    font-weight: 600;
+    border-radius: 10px;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+    width: 100%;
+    margin-top: 20px;
+}
+
+.curriculo-form button[type="submit"]:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+
+.curriculo-form button[type="submit"]:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
