@@ -1,12 +1,17 @@
-# React + Vite
+# Aplicativo Web Gerador de Currículo
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Este repositório consiste em uma aplicação web que gera currículos com base nas informações que o usuário do App insere sobre si mesmo no formulário, gerando um currículo em PDF com as informações dele, podendo ser usado para candidaturas para vagas de emprego.
 
-Currently, two official plugins are available:
+***
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+### Tecnologias Utilizadas
 
-## Expanding the ESLint configuration
+- React: Front-End e interfaces do App;
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+- Firebase: Back-End do App feito de forma On-line com uso para login e autenticação de usuários com uso do provedor do Google;
+
+***
+
+### Objetivos do Projeto
+
+Se tornar um futuro Micro-Sass, com objetivo de uso comercial e lucro.

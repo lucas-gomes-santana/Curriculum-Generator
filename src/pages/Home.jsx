@@ -25,7 +25,8 @@ function Home() {
         expInicio: "",
         expTermino: "",
         expAtual: false,
-        expDescricao: ""
+        expDescricao: "",
+        semExperiencia: false
     });
 
     const handleChange = (e) => {
@@ -39,52 +40,95 @@ function Home() {
     const handleSubmit = (e) => {
         e.preventDefault();
         const doc = new jsPDF();
-        let y = 15;
+        let y = 20; // Posição vertical inicial
+        const marginLeft = 15;
+        const lineHeight = 7;
+        const sectionSpacing = 10;
+
+        // Nome
         doc.setFontSize(22);
+        doc.setFont("helvetica", "bold");
         doc.text(form.nome, 105, y, { align: "center" });
-        y += 10;
+        y += 15;
+        // Linha divisória
+        doc.setDrawColor(200, 200, 200);
+        doc.line(marginLeft, y, 200 - marginLeft, y);
+        y += sectionSpacing;
+
+        // Contato
         doc.setFontSize(12);
         doc.setFont("helvetica", "bold");
-        doc.text("Contato:", 10, y);
-        doc.setFont("times", "normal");
-        doc.text(`Email: ${form.email}  |  Telefone: ${form.telefone}`, 35, y);
-        y += 7;
+        doc.text("Contato:", marginLeft, y);
+        doc.setFont("helvetica", "normal");
+        doc.text(`Email: ${form.email} | Telefone: ${form.telefone}`, marginLeft + 25, y);
+        y += lineHeight;
+        // Endereço
         doc.setFont("helvetica", "bold");
-        doc.text("Endereço:", 10, y);
-        doc.setFont("times", "normal");
-        doc.text(
-            `${form.rua}, ${form.numero}${form.complemento ? ", " + form.complemento : ""} - ${form.cidade} - ${form.estado} - CEP: ${form.cep}`,
-            35,
-            y
-        );
-        y += 10;
+        doc.text("Endereço:", marginLeft, y);
+        doc.setFont("helvetica", "normal");
+        const endereco = `${form.rua}, ${form.numero}${form.complemento ? ", " + form.complemento : ""} - ${form.cidade} - ${form.estado} - CEP: ${form.cep}`;
+        doc.text(endereco, marginLeft + 25, y);
+        y += sectionSpacing;
+        // Linha divisória
+        doc.line(marginLeft, y, 200 - marginLeft, y);
+        y += sectionSpacing;
+
+        // Resumo
         doc.setFont("helvetica", "bold");
-        doc.text("Resumo:", 10, y);
-        y += 7;
-        doc.setFont("times", "normal");
-        doc.text(form.resumo, 10, y, { maxWidth: 190 });
-        y += 15;
+        doc.text("Resumo Profissional:", marginLeft, y);
+        y += lineHeight;
+        doc.setFont("helvetica", "normal");
+        const resumoLines = doc.splitTextToSize(form.resumo, 180);
+        doc.text(resumoLines, marginLeft, y);
+        y += (resumoLines.length * lineHeight) + 5; // Espaço menor após resumo
+        // Linha divisória
+        doc.line(marginLeft, y, 200 - marginLeft, y);
+        y += sectionSpacing;
+
+        // Formação Acadêmica
         doc.setFont("helvetica", "bold");
-        doc.text("Formação Acadêmica:", 10, y);
-        y += 7;
-        doc.setFont("times", "normal");
-        doc.text(
-            `${form.formacaoCurso} - ${form.formacaoInstituicao}\n${form.formacaoInicio} até ${form.formacaoTermino}\n${form.formacaoDescricao}`,
-            10,
-            y,
-            { maxWidth: 190 }
-        );
-        y += 20;
-        doc.setFont("helvetica", "bold");
-        doc.text("Experiência Profissional:", 10, y);
-        y += 7;
-        doc.setFont("times", "normal");
-        doc.text(
-            `${form.expCargo} - ${form.expEmpresa}\n${form.expInicio} até ${form.expAtual ? "Atualmente" : form.expTermino}\n${form.expDescricao}`,
-            10,
-            y,
-            { maxWidth: 190 }
-        );
+        doc.text("Formação Acadêmica:", marginLeft, y);
+        y += lineHeight;
+        doc.setFont("helvetica", "normal");
+        const formacaoText = [
+            `Curso: ${form.formacaoCurso}`,
+            `Instituição de Ensino: ${form.formacaoInstituicao}`,
+            `${form.formacaoInicio} - ${form.formacaoTermino}`,
+            `${form.formacaoDescricao}`
+        ];
+        formacaoText.forEach(line => {
+            if (line.trim()) {
+                const wrappedLines = doc.splitTextToSize(line, 180);
+                doc.text(wrappedLines, marginLeft, y);
+                y += (wrappedLines.length * lineHeight);
+            }
+        });
+        y += 5;
+        // Linha divisória
+        doc.line(marginLeft, y, 200 - marginLeft, y);
+        y += sectionSpacing;
+
+        // Experiência Profissional (só se não marcar semExperiencia)
+        if (!form.semExperiencia) {
+            doc.setFont("helvetica", "bold");
+            doc.text("Experiência Profissional:", marginLeft, y);
+            y += lineHeight;
+            doc.setFont("helvetica", "normal");
+            const expTermino = form.expAtual ? "Atualmente" : form.expTermino;
+            const experienciaText = [
+                `Cargo: ${form.expCargo}`,
+                `Empresa: ${form.expEmpresa}`,
+                `${form.expInicio} - ${expTermino}`,
+                `${form.expDescricao}`
+            ];
+            experienciaText.forEach(line => {
+                if (line.trim()) {
+                    const wrappedLines = doc.splitTextToSize(line, 180);
+                    doc.text(wrappedLines, marginLeft, y);
+                    y += (wrappedLines.length * lineHeight);
+                }
+            });
+        }
         doc.save("curriculo-ATS.pdf");
     };
 
@@ -178,28 +222,35 @@ function Home() {
                 <fieldset>
                     <legend>Experiência Profissional</legend>
                     <label>
-                        Empresa:
-                        <input name="expEmpresa" value={form.expEmpresa} onChange={handleChange} disabled={!isFormEnabled} required />
+                        <input type="checkbox" name="semExperiencia" checked={form.semExperiencia} onChange={handleChange} disabled={!isFormEnabled} /> Ainda não possuo experiência profissional
                     </label>
-                    <label>
-                        Cargo:
-                        <input name="expCargo" value={form.expCargo} onChange={handleChange} disabled={!isFormEnabled} required />
-                    </label>
-                    <label>
-                        Data de início:
-                        <input name="expInicio" type="month" value={form.expInicio} onChange={handleChange} disabled={!isFormEnabled} required />
-                    </label>
-                    <label>
-                        Data de término:
-                        <input name="expTermino" type="month" value={form.expTermino} onChange={handleChange} disabled={!isFormEnabled || form.expAtual} required={!form.expAtual} />
-                    </label>
-                    <label>
-                        <input type="checkbox" name="expAtual" checked={form.expAtual} onChange={handleChange} disabled={!isFormEnabled} /> Atualmente trabalho aqui
-                    </label>
-                    <label>
-                        Descrição das atividades:
-                        <textarea name="expDescricao" value={form.expDescricao} onChange={handleChange} disabled={!isFormEnabled} />
-                    </label>
+                    {!form.semExperiencia && (
+                        <>
+                            <label>
+                                Empresa:
+                                <input name="expEmpresa" value={form.expEmpresa} onChange={handleChange} disabled={!isFormEnabled} required={!form.semExperiencia} />
+                            </label>
+                            <label>
+                                Cargo:
+                                <input name="expCargo" value={form.expCargo} onChange={handleChange} disabled={!isFormEnabled} required={!form.semExperiencia} />
+                            </label>
+                            <label>
+                                Data de início:
+                                <input name="expInicio" type="month" value={form.expInicio} onChange={handleChange} disabled={!isFormEnabled} required={!form.semExperiencia} />
+                            </label>
+                            <label>
+                                Data de término:
+                                <input name="expTermino" type="month" value={form.expTermino} onChange={handleChange} disabled={!isFormEnabled || form.expAtual} required={!form.expAtual && !form.semExperiencia} />
+                            </label>
+                            <label>
+                                <input type="checkbox" name="expAtual" checked={form.expAtual} onChange={handleChange} disabled={!isFormEnabled} /> Atualmente trabalho aqui
+                            </label>
+                            <label>
+                                Descrição das atividades:
+                                <textarea name="expDescricao" value={form.expDescricao} onChange={handleChange} disabled={!isFormEnabled} />
+                            </label>
+                        </>
+                    )}
                 </fieldset>
                 <button type="submit" disabled={!isFormEnabled}>Gerar Currículo PDF</button>
             </form>
