@@ -1,5 +1,7 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import jsPDF from "jspdf";
+import { auth } from "../services/firebase";
+import { salvarCurriculo } from "../services/storage";
 import "../styles/Home.css";
 
 function Home() {
@@ -28,6 +30,12 @@ function Home() {
         expDescricao: "",
         semExperiencia: false
     });
+    const [foto, setFoto] = useState(null); // base64
+    const [fotoPreview, setFotoPreview] = useState(null); // url para preview
+    const [showSaveOptions, setShowSaveOptions] = useState(false);
+    const [saving, setSaving] = useState(false);
+    const [saveMessage, setSaveMessage] = useState("");
+    const fileInputRef = useRef();
 
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
@@ -37,13 +45,37 @@ function Home() {
         });
     };
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
+    const handleFotoChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+                setFoto(ev.target.result); // base64
+                setFotoPreview(ev.target.result); // para preview
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
+    const generatePDF = () => {
         const doc = new jsPDF();
-        let y = 20; // Posição vertical inicial
+        let y = 15;
         const marginLeft = 15;
-        const lineHeight = 7;
-        const sectionSpacing = 10;
+        const lineHeight = 6;
+        const sectionSpacing = 7;
+
+        // Foto (se houver)
+        if (foto) {
+            // Tamanho e posição da foto
+            const imgSize = 40;
+            const xCenter = (210 - imgSize) / 2; // Centralizar horizontalmente
+            // Desenhar círculo branco para "máscara"
+            doc.setFillColor(255,255,255);
+            doc.circle(105, y + imgSize/2, imgSize/2 + 2, 'F');
+            // Adicionar imagem
+            doc.addImage(foto, 'JPEG', xCenter, y, imgSize, imgSize, undefined, 'FAST');
+            y += imgSize + 10; // Mais espaço após a foto
+        }
 
         // Nome
         doc.setFontSize(22);
@@ -80,7 +112,7 @@ function Home() {
         doc.setFont("helvetica", "normal");
         const resumoLines = doc.splitTextToSize(form.resumo, 180);
         doc.text(resumoLines, marginLeft, y);
-        y += (resumoLines.length * lineHeight) + 5; // Espaço menor após resumo
+        y += (resumoLines.length * lineHeight); 
         // Linha divisória
         doc.line(marginLeft, y, 200 - marginLeft, y);
         y += sectionSpacing;
@@ -129,7 +161,64 @@ function Home() {
                 }
             });
         }
-        doc.save("curriculo-ATS.pdf");
+
+        return doc;
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        
+        try {
+            const doc = generatePDF();
+            
+            // Download automático
+            doc.save("curriculo-ATS.pdf");
+            
+            // Mostrar opções de salvar se usuário estiver logado
+            if (auth.currentUser) {
+                setShowSaveOptions(true);
+            }
+        } catch (error) {
+            console.error("Erro ao gerar PDF:", error);
+            alert("Erro ao gerar o PDF. Tente novamente.");
+        }
+    };
+
+    const handleSaveToCloud = async () => {
+        if (!auth.currentUser) {
+            alert("Você precisa estar logado para salvar o currículo.");
+            return;
+        }
+
+        try {
+            setSaving(true);
+            setSaveMessage("Salvando currículo...");
+            
+            // Preparar dados do currículo incluindo a foto
+            const dadosCurriculo = {
+                ...form,
+                foto: foto // incluir a foto base64
+            };
+            
+            await salvarCurriculo(dadosCurriculo, auth.currentUser.uid);
+            
+            setSaveMessage("Currículo salvo com sucesso! ✅");
+            setTimeout(() => {
+                setShowSaveOptions(false);
+                setSaveMessage("");
+            }, 2000);
+            
+        } catch (error) {
+            console.error("Erro ao salvar currículo:", error);
+            setSaveMessage("Erro ao salvar currículo. Tente novamente. ❌");
+        } finally {
+            setSaving(false);
+        }
+    };
+
+    const handleSkipSave = () => {
+        setShowSaveOptions(false);
+        setSaveMessage("");
     };
 
     return (
@@ -156,6 +245,31 @@ function Home() {
                     transition: "all 0.3s ease"
                 }}
             >
+                <label style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+                    Foto (opcional):
+                    <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleFotoChange}
+                        disabled={!isFormEnabled}
+                        ref={fileInputRef}
+                        style={{ margin: "10px 0" }}
+                    />
+                    {fotoPreview && (
+                        <img
+                            src={fotoPreview}
+                            alt="Preview"
+                            style={{
+                                width: 100,
+                                height: 100,
+                                objectFit: "cover",
+                                borderRadius: "50%",
+                                border: "3px solid #667eea",
+                                marginBottom: 10
+                            }}
+                        />
+                    )}
+                </label>
                 <label>
                     Nome:
                     <input name="nome" value={form.nome} onChange={handleChange} disabled={!isFormEnabled} required />
@@ -254,6 +368,49 @@ function Home() {
                 </fieldset>
                 <button type="submit" disabled={!isFormEnabled}>Gerar Currículo PDF</button>
             </form>
+
+            {/* Modal de opções de salvar */}
+            {showSaveOptions && (
+                <div className="save-modal-overlay">
+                    <div className="save-modal">
+                        <h3>Currículo gerado com sucesso! 📄</h3>
+                        <p>Deseja salvar este currículo na nuvem para acessá-lo depois?</p>
+                        
+                        {saveMessage && (
+                            <div className={`save-message ${saveMessage.includes('sucesso') ? 'success' : 'error'}`}>
+                                {saveMessage}
+                            </div>
+                        )}
+                        
+                        <div className="save-actions">
+                            <button 
+                                onClick={handleSaveToCloud} 
+                                disabled={saving}
+                                className="btn-save"
+                            >
+                                {saving ? "Salvando..." : "💾 Salvar na nuvem"}
+                            </button>
+                            <button 
+                                onClick={handleSkipSave}
+                                className="btn-skip"
+                                disabled={saving}
+                            >
+                                Pular
+                            </button>
+                        </div>
+                        
+                        <div className="save-benefits">
+                            <h4>Benefícios de salvar:</h4>
+                            <ul>
+                                <li>✅ Acesse seus currículos de qualquer lugar</li>
+                                <li>✅ Faça download novamente quando quiser</li>
+                                <li>✅ Organize múltiplos currículos</li>
+                                <li>✅ Não perca seus dados</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
