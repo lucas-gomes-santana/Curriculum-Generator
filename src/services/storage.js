@@ -24,13 +24,11 @@ export const salvarCurriculo = async (dadosCurriculo, userId) => {
       cep: dadosCurriculo.cep,
       rua: dadosCurriculo.rua,
       numero: dadosCurriculo.numero,
-      complemento: dadosCurriculo.complemento,
       resumo: dadosCurriculo.resumo,
       formacaoInstituicao: dadosCurriculo.formacaoInstituicao,
       formacaoCurso: dadosCurriculo.formacaoCurso,
       formacaoInicio: dadosCurriculo.formacaoInicio,
       formacaoTermino: dadosCurriculo.formacaoTermino,
-      formacaoDescricao: dadosCurriculo.formacaoDescricao,
       expEmpresa: dadosCurriculo.expEmpresa,
       expCargo: dadosCurriculo.expCargo,
       expInicio: dadosCurriculo.expInicio,
@@ -138,7 +136,7 @@ export const gerarPDFFromData = (curriculoData) => {
   doc.setFont("helvetica", "bold");
   doc.text("Endereço:", marginLeft, y);
   doc.setFont("helvetica", "normal");
-  const endereco = `${curriculoData.rua}, ${curriculoData.numero}${curriculoData.complemento ? ", " + curriculoData.complemento : ""} - ${curriculoData.cidade} - ${curriculoData.estado} - CEP: ${curriculoData.cep}`;
+  const endereco = `${curriculoData.rua}, ${curriculoData.numero} - ${curriculoData.cidade} - ${curriculoData.estado} - CEP: ${curriculoData.cep}`;
   doc.text(endereco, marginLeft + 25, y);
   y += sectionSpacing;
   doc.line(marginLeft, y, 200 - marginLeft, y);

@@ -16,15 +16,14 @@ function Navigation() {
   };
 
   // Não mostrar navegação na página de login
-  if (location.pathname === '/login') {
-    return null;
-  }
+  if (location.pathname == '/login') return null;
 
   return (
     <nav className="navigation">
       <div className="nav-container">
+
         <div className="nav-brand">
-          <h2>📄 Gerador de Currículo</h2>
+          <h2>📄 Curriculum Generator</h2>
         </div>
         
         <div className="nav-links">
@@ -45,13 +44,17 @@ function Navigation() {
         <div className="nav-user">
           {auth.currentUser && (
             <div className="user-info">
+
               <span className="user-email">{auth.currentUser.email}</span>
+
               <button onClick={handleLogout} className="logout-btn">
                 🚪 Sair
               </button>
+              
             </div>
           )}
         </div>
+
       </div>
     </nav>
   );

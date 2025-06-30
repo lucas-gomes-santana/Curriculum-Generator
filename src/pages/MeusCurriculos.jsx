@@ -139,7 +139,7 @@ function MeusCurriculos() {
                     disabled={deletingId === curriculo.id}
                     title="Deletar currículo"
                   >
-                    {deletingId === curriculo.id ? "🗑️ Deletando..." : "🗑️ Deletar"}
+                    {deletingId === curriculo.id ? "🗑️ Excluindo..." : "🗑️ Excluir"}
                   </button>
                 </div>
               </div>

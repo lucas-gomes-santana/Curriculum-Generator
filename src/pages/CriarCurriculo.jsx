@@ -2,7 +2,7 @@ import { useState, useRef } from "react";
 import jsPDF from "jspdf";
 import { auth } from "../services/firebase";
 import { salvarCurriculo } from "../services/storage";
-import "../styles/Home.css";
+import "../styles/CriarCurriculo.css";
 
 function Home() {
     const [isFormEnabled, setIsFormEnabled] = useState(false);
@@ -15,20 +15,20 @@ function Home() {
         cep: "",
         rua: "",
         numero: "",
-        complemento: "",
         resumo: "",
         formacaoInstituicao: "",
         formacaoCurso: "",
         formacaoInicio: "",
         formacaoTermino: "",
-        formacaoDescricao: "",
         expEmpresa: "",
         expCargo: "",
         expInicio: "",
         expTermino: "",
         expAtual: false,
         expDescricao: "",
-        semExperiencia: false
+        semExperiencia: false,
+        habilidadesTecnicas: "",
+        habilidadesPessoais: ""
     });
     const [foto, setFoto] = useState(null); // base64
     const [fotoPreview, setFotoPreview] = useState(null); // url para preview
@@ -98,7 +98,7 @@ function Home() {
         doc.setFont("helvetica", "bold");
         doc.text("Endereço:", marginLeft, y);
         doc.setFont("helvetica", "normal");
-        const endereco = `${form.rua}, ${form.numero}${form.complemento ? ", " + form.complemento : ""} - ${form.cidade} - ${form.estado} - CEP: ${form.cep}`;
+        const endereco = `${form.rua}, ${form.numero} - ${form.cidade} - ${form.estado} - CEP: ${form.cep}`;
         doc.text(endereco, marginLeft + 25, y);
         y += sectionSpacing;
         // Linha divisória
@@ -117,6 +117,39 @@ function Home() {
         doc.line(marginLeft, y, 200 - marginLeft, y);
         y += sectionSpacing;
 
+        // Habilidades
+        const tecnicas = form.habilidadesTecnicas.split(',').map(s => s.trim()).filter(s => s);
+        const pessoais = form.habilidadesPessoais.split(',').map(s => s.trim()).filter(s => s);
+
+        if (tecnicas.length > 0 || pessoais.length > 0) {
+            doc.setFont("helvetica", "bold");
+            doc.text("Habilidades", marginLeft, y);
+            y += lineHeight;
+            
+            if (tecnicas.length > 0) {
+                doc.setFont("helvetica", "bold");
+                doc.text("Técnicas:", marginLeft, y);
+                doc.setFont("helvetica", "normal");
+                const skillsLines = doc.splitTextToSize(tecnicas.join(' • '), 170);
+                doc.text(skillsLines, marginLeft + 25, y);
+                y += (skillsLines.length * lineHeight);
+            }
+
+            if (pessoais.length > 0) {
+                doc.setFont("helvetica", "bold");
+                doc.text("Pessoais:", marginLeft, y);
+                doc.setFont("helvetica", "normal");
+                const skillsLines = doc.splitTextToSize(pessoais.join(' • '), 170);
+                doc.text(skillsLines, marginLeft + 25, y);
+                y += (skillsLines.length * lineHeight);
+            }
+            
+            y += 5;
+            // Linha divisória
+            doc.line(marginLeft, y, 200 - marginLeft, y);
+            y += sectionSpacing;
+        }
+
         // Formação Acadêmica
         doc.setFont("helvetica", "bold");
         doc.text("Formação Acadêmica:", marginLeft, y);
@@ -126,7 +159,6 @@ function Home() {
             `Curso: ${form.formacaoCurso}`,
             `Instituição de Ensino: ${form.formacaoInstituicao}`,
             `${form.formacaoInicio} - ${form.formacaoTermino}`,
-            `${form.formacaoDescricao}`
         ];
         formacaoText.forEach(line => {
             if (line.trim()) {
@@ -291,10 +323,6 @@ function Home() {
                     <input name="numero" value={form.numero} onChange={handleChange} disabled={!isFormEnabled} required />
                 </label>
                 <label>
-                    Complemento:
-                    <input name="complemento" value={form.complemento} onChange={handleChange} disabled={!isFormEnabled} />
-                </label>
-                <label>
                     Cidade:
                     <input name="cidade" value={form.cidade} onChange={handleChange} disabled={!isFormEnabled} required />
                 </label>
@@ -310,6 +338,17 @@ function Home() {
                     Resumo:
                     <textarea name="resumo" value={form.resumo} onChange={handleChange} disabled={!isFormEnabled} required />
                 </label>
+                <fieldset>
+                    <legend>Habilidades</legend>
+                    <label>
+                        Habilidades Técnicas (separadas por vírgula):
+                        <textarea name="habilidadesTecnicas" value={form.habilidadesTecnicas} onChange={handleChange} disabled={!isFormEnabled} placeholder="Ex: React, Node.js, Gestão de Projetos" />
+                    </label>
+                    <label>
+                        Habilidades Pessoais (separadas por vírgula):
+                        <textarea name="habilidadesPessoais" value={form.habilidadesPessoais} onChange={handleChange} disabled={!isFormEnabled} placeholder="Ex: Comunicação, Liderança, Trabalho em equipe" />
+                    </label>
+                </fieldset>
                 <fieldset>
                     <legend>Formação Acadêmica</legend>
                     <label>
@@ -327,10 +366,6 @@ function Home() {
                     <label>
                         Data de término:
                         <input name="formacaoTermino" type="month" value={form.formacaoTermino} onChange={handleChange} disabled={!isFormEnabled} required />
-                    </label>
-                    <label>
-                        Descrição:
-                        <textarea name="formacaoDescricao" value={form.formacaoDescricao} onChange={handleChange} disabled={!isFormEnabled} />
                     </label>
                 </fieldset>
                 <fieldset>

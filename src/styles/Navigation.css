@@ -23,8 +23,8 @@
   color: #333;
   font-size: 1.5rem;
   font-weight: 700;
-  background: linear-gradient(135deg, #667eea, #764ba2);
   -webkit-background-clip: text;
+  background: linear-gradient(135deg, #667eea, #764ba2);
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
@@ -92,6 +92,23 @@
 }
 
 /* Responsividade */
+@media (max-width: 1100px) {
+  .nav-brand h2 {
+    font-size: 1rem;
+  }
+
+  .nav-links .nav-link {
+    padding: 5px 10px;
+    font-size: 0.9rem; 
+  }
+}
+
+@media (max-width: 900px) {
+  .user-email {
+    display: none;
+  }
+}
+
 @media (max-width: 768px) {
   .nav-container {
     padding: 0 15px;
@@ -115,17 +132,13 @@
     gap: 10px;
   }
   
-  .user-email {
-    display: none;
-  }
-  
   .logout-btn {
     padding: 6px 12px;
     font-size: 0.8rem;
   }
 }
 
-@media (max-width: 480px) {
+@media (max-width: 650px) {
   .nav-container {
     flex-direction: column;
     height: auto;
@@ -144,4 +157,4 @@
   .nav-brand {
     order: 1;
   }
-} 
+}
