@@ -28,8 +28,8 @@ function Navigation() {
         
         <div className="nav-links">
           <Link 
-            to="/home" 
-            className={`nav-link ${location.pathname === '/home' ? 'active' : ''}`}
+            to="/criar-curriculo" 
+            className={`nav-link ${location.pathname === '/criar-curriculo' ? 'active' : ''}`}
           >
             🏠 Criar Currículo
           </Link>

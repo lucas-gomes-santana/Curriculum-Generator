@@ -46,7 +46,7 @@ function MeusCurriculos() {
   };
 
   const handleDelete = async (curriculo) => {
-    if (!window.confirm("Tem certeza que deseja deletar este currículo?")) {
+    if (!window.confirm("Tem certeza que deseja excluir este currículo?")) {
       return;
     }
 
@@ -100,6 +100,7 @@ function MeusCurriculos() {
 
   return (
     <div className="meus-curriculos-container">
+      
       <div className="header">
         <h1>Meus Currículos</h1>
         <button onClick={carregarCurriculos} className="refresh-btn">
@@ -117,14 +118,19 @@ function MeusCurriculos() {
         <div className="curriculos-grid">
           {curriculos.map((curriculo) => (
             <div key={curriculo.id} className="curriculo-card">
+
               <div className="curriculo-header">
+
                 <div className="curriculo-info">
+
                   <h3>{curriculo.nome || "Currículo sem nome"}</h3>
                   <p className="email">{curriculo.email}</p>
                   <p className="data">
                     Criado em: {formatarData(curriculo.dataCriacao)}
                   </p>
+
                 </div>
+
                 <div className="curriculo-actions">
                   <button
                     onClick={() => handleDownload(curriculo)}
@@ -133,6 +139,7 @@ function MeusCurriculos() {
                   >
                     📥 Download
                   </button>
+
                   <button
                     onClick={() => handleDelete(curriculo)}
                     className="btn-delete"
@@ -141,35 +148,43 @@ function MeusCurriculos() {
                   >
                     {deletingId === curriculo.id ? "🗑️ Excluindo..." : "🗑️ Excluir"}
                   </button>
+
                 </div>
+
               </div>
               
               <div className="curriculo-preview">
                 <div className="preview-info">
+                  
                   <div className="info-item">
                     <strong>Telefone:</strong> 
                     <span>{curriculo.telefone || "Não informado"}</span>
                   </div>
+
                   <div className="info-item">
                     <strong>Cidade:</strong> 
                     <span>{curriculo.cidade || "Não informada"}</span>
                   </div>
+
                   <div className="info-item">
                     <strong>Estado:</strong> 
                     <span>{curriculo.estado || "Não informado"}</span>
                   </div>
+
                   {curriculo.formacaoCurso && (
                     <div className="info-item">
                       <strong>Formação:</strong> 
                       <span>{curriculo.formacaoCurso}</span>
                     </div>
                   )}
+
                   {curriculo.expCargo && (
                     <div className="info-item">
                       <strong>Último cargo:</strong> 
                       <span>{curriculo.expCargo}</span>
                     </div>
                   )}
+
                 </div>
               </div>
             </div>

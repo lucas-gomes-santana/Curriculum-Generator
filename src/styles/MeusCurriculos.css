@@ -163,6 +163,7 @@
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
+  flex-wrap: wrap;
   margin-bottom: 20px;
   padding-bottom: 15px;
   border-bottom: 2px solid #f0f0f0;
@@ -269,4 +270,27 @@
   text-align: right;
   max-width: 60%;
   word-wrap: break-word;
+}
+
+@media (max-width: 1200px) {
+  .meus-curriculos-container {
+    width: 100%;
+  }
+}
+
+@media (max-width: 630px) {
+  .header h1 {
+    font-size: 1.3rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .header h1 {
+    font-size: 1rem;
+  }
+
+  .refresh-btn {
+    padding: 8px 12px;
+    font-size: 0.8rem;
+  }
 }

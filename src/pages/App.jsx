@@ -1,5 +1,5 @@
 import Login from './Login';
-import Home from './CriarCurriculo';
+import CriarCurriculo from './CriarCurriculo';
 import MeusCurriculos from './MeusCurriculos';
 import Navigation from '../components/Navigation';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
@@ -13,7 +13,7 @@ function App() {
                     <Routes>
                         <Route path="/" element={<Navigate to="/login" />} />
                         <Route path="/login" element={<Login />} />
-                        <Route path='/criar-curriculo' element={<Home/>}/>
+                        <Route path='/criar-curriculo' element={<CriarCurriculo/>}/>
                         <Route path='/meus-curriculos' element={<MeusCurriculos/>}/>
                     </Routes>
                 </main>
