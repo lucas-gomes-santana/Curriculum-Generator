@@ -12,7 +12,6 @@ function CriarCurriculo() {
         telefone: "",
         cidade: "",
         estado: "",
-        cep: "",
         rua: "",
         numero: "",
         resumo: "",
@@ -196,10 +195,6 @@ function CriarCurriculo() {
                 <label>
                     Estado:
                     <input name="estado" value={form.estado} onChange={handleChange} disabled={!isFormEnabled} required />
-                </label>
-                <label>
-                    CEP:
-                    <input name="cep" value={form.cep} onChange={handleChange} disabled={!isFormEnabled} required />
                 </label>
                 <label>
                     Resumo:

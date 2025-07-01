@@ -46,7 +46,7 @@ export const gerarPDFCurriculo = (dadosCurriculo) => {
     doc.setFont("helvetica", "bold");
     doc.text("Endereço:", marginLeft, y);
     doc.setFont("helvetica", "normal");
-    const endereco = `${dadosCurriculo.rua}, ${dadosCurriculo.numero} - ${dadosCurriculo.cidade} - ${dadosCurriculo.estado} - CEP: ${dadosCurriculo.cep}`;
+    const endereco = `${dadosCurriculo.rua}, ${dadosCurriculo.numero} - ${dadosCurriculo.cidade} - ${dadosCurriculo.estado}`;
     doc.text(endereco, marginLeft + 25, y);
     y += sectionSpacing;
     // Linha divisória
@@ -65,7 +65,7 @@ export const gerarPDFCurriculo = (dadosCurriculo) => {
     doc.line(marginLeft, y, 200 - marginLeft, y);
     y += sectionSpacing;
 
-    // Habilidades (se existirem)
+    // Habilidades
     const tecnicas = dadosCurriculo.habilidadesTecnicas ? 
         dadosCurriculo.habilidadesTecnicas.split(',').map(s => s.trim()).filter(s => s) : [];
     const pessoais = dadosCurriculo.habilidadesPessoais ? 
