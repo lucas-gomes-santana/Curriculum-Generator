@@ -153,6 +153,8 @@ export const gerarPDFCurriculo = (dadosCurriculo) => {
     return doc;
 };
 
+
+
 /**
  * Faz o download do PDF gerado
  * @param {Object} dadosCurriculo - Dados do currículo

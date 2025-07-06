@@ -5,6 +5,8 @@ import {
   deletarCurriculo, 
   downloadCurriculo 
 } from "../services/storage";
+
+
 import "../styles/MeusCurriculos.css";
 
 function MeusCurriculos() {
@@ -12,6 +14,7 @@ function MeusCurriculos() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [deletingId, setDeletingId] = useState(null);
+
 
   useEffect(() => {
     carregarCurriculos();
@@ -62,6 +65,10 @@ function MeusCurriculos() {
       setDeletingId(null);
     }
   };
+
+
+
+
 
   const formatarData = (data) => {
     if (!data) return "Data não disponível";
@@ -154,37 +161,68 @@ function MeusCurriculos() {
               </div>
               
               <div className="curriculo-preview">
-                <div className="preview-info">
+                <div className="preview-content">
+                  <div className="preview-header">
+                    <h3>{curriculo.nome}</h3>
+                    <p className="email">{curriculo.email}</p>
+                  </div>
                   
-                  <div className="info-item">
-                    <strong>Telefone:</strong> 
-                    <span>{curriculo.telefone || "Não informado"}</span>
-                  </div>
-
-                  <div className="info-item">
-                    <strong>Cidade:</strong> 
-                    <span>{curriculo.cidade || "Não informada"}</span>
-                  </div>
-
-                  <div className="info-item">
-                    <strong>Estado:</strong> 
-                    <span>{curriculo.estado || "Não informado"}</span>
-                  </div>
-
-                  {curriculo.formacaoCurso && (
-                    <div className="info-item">
-                      <strong>Formação:</strong> 
-                      <span>{curriculo.formacaoCurso}</span>
+                  <div className="preview-sections">
+                    <div className="info-section">
+                      <h4>Informações de Contato</h4>
+                      <p><strong>Telefone:</strong> {curriculo.telefone || 'Não informado'}</p>
+                      <p><strong>Endereço:</strong> {curriculo.rua}, {curriculo.numero} - {curriculo.cidade} - {curriculo.estado}</p>
                     </div>
-                  )}
 
-                  {curriculo.expCargo && (
-                    <div className="info-item">
-                      <strong>Último cargo:</strong> 
-                      <span>{curriculo.expCargo}</span>
-                    </div>
-                  )}
+                    {curriculo.resumo && (
+                      <div className="info-section">
+                        <h4>Resumo Profissional</h4>
+                        <p>{curriculo.resumo}</p>
+                      </div>
+                    )}
 
+                    {curriculo.formacaoCurso && (
+                      <div className="info-section">
+                        <h4>Formação Acadêmica</h4>
+                        <p><strong>Curso:</strong> {curriculo.formacaoCurso}</p>
+                        <p><strong>Instituição:</strong> {curriculo.formacaoInstituicao || 'Não informada'}</p>
+                        <p><strong>Período:</strong> {curriculo.formacaoInicio || ''} - {curriculo.formacaoTermino || ''}</p>
+                        {curriculo.formacaoDescricao && (
+                          <p><strong>Descrição:</strong> {curriculo.formacaoDescricao}</p>
+                        )}
+                      </div>
+                    )}
+
+                    {!curriculo.semExperiencia && curriculo.expCargo && (
+                      <div className="info-section">
+                        <h4>Experiência Profissional</h4>
+                        <p><strong>Cargo:</strong> {curriculo.expCargo}</p>
+                        <p><strong>Empresa:</strong> {curriculo.expEmpresa || 'Não informada'}</p>
+                        <p><strong>Período:</strong> {curriculo.expInicio || ''} - {curriculo.expAtual ? 'Atualmente' : curriculo.expTermino || ''}</p>
+                        {curriculo.expDescricao && (
+                          <p><strong>Descrição:</strong> {curriculo.expDescricao}</p>
+                        )}
+                      </div>
+                    )}
+
+                    {(curriculo.habilidadesTecnicas || curriculo.habilidadesPessoais) && (
+                      <div className="info-section">
+                        <h4>Habilidades</h4>
+                        {curriculo.habilidadesTecnicas && (
+                          <div>
+                            <p><strong>Técnicas:</strong></p>
+                            <p>{curriculo.habilidadesTecnicas}</p>
+                          </div>
+                        )}
+                        {curriculo.habilidadesPessoais && (
+                          <div>
+                            <p><strong>Pessoais:</strong></p>
+                            <p>{curriculo.habilidadesPessoais}</p>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>

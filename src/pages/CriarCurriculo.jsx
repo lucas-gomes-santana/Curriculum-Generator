@@ -1,7 +1,7 @@
 import { useState, useRef } from "react";
 import { auth } from "../services/firebase";
 import { salvarCurriculo } from "../services/storage";
-import { downloadPDFCurriculo } from "../utils/pdfGenerator";
+import { downloadPDFCurriculo } from "../templates/template1";
 import "../styles/CriarCurriculo.css";
 
 function CriarCurriculo() {

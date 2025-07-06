@@ -8,7 +8,7 @@ import {
   deleteDoc,
   doc 
 } from 'firebase/firestore';
-import { downloadPDFCurriculo } from '../utils/pdfGenerator';
+import { downloadPDFCurriculo } from '../templates/template1';
 
 // Salvar currículo no Firestore
 export const salvarCurriculo = async (dadosCurriculo, userId) => {
