@@ -2,9 +2,10 @@ import { useState, useEffect } from "react";
 import { auth } from "../services/firebase";
 import { 
   buscarCurriculosUsuario, 
-  deletarCurriculo, 
-  downloadCurriculo 
+  deletarCurriculo
 } from "../services/storage";
+import { downloadPDFCurriculo as downloadTemplate1 } from "../templates/template1";
+import { downloadPDFCurriculo as downloadTemplate2 } from "../templates/template2";
 
 
 import "../styles/MeusCurriculos.css";
@@ -42,7 +43,18 @@ function MeusCurriculos() {
 
   const handleDownload = async (curriculo) => {
     try {
-      await downloadCurriculo(curriculo);
+      // Usar o template correto baseado nos dados salvos
+      const template = curriculo.template || 'template1';
+      const backgroundColor = curriculo.backgroundColor || 'azul';
+      
+      if (template === 'template1') {
+        downloadTemplate1(curriculo, `curriculo_${curriculo.nome}.pdf`);
+      } else if (template === 'template2') {
+        await downloadTemplate2(curriculo, `curriculo_${curriculo.nome}.pdf`, backgroundColor);
+      } else {
+        // Fallback para template1 se não especificado
+        downloadTemplate1(curriculo, `curriculo_${curriculo.nome}.pdf`);
+      }
     } catch (err) {
       setError("Erro ao fazer download: " + err.message);
     }
@@ -134,6 +146,10 @@ function MeusCurriculos() {
                   <p className="email">{curriculo.email}</p>
                   <p className="data">
                     Criado em: {formatarData(curriculo.dataCriacao)}
+                  </p>
+                  <p className="template-info">
+                    Template: {curriculo.template === 'template2' ? 'Moderno' : 'Clássico'}
+                    {curriculo.backgroundColor && ` (${curriculo.backgroundColor})`}
                   </p>
 
                 </div>

@@ -1,11 +1,14 @@
 import { useState, useRef } from "react";
 import { auth } from "../services/firebase";
 import { salvarCurriculo } from "../services/storage";
-import { downloadPDFCurriculo } from "../templates/template1";
+import { downloadPDFCurriculo as downloadTemplate1 } from "../templates/template1";
+import { downloadPDFCurriculo as downloadTemplate2 } from "../templates/template2";
 import "../styles/CriarCurriculo.css";
 
 function CriarCurriculo() {
     const [isFormEnabled, setIsFormEnabled] = useState(false);
+    const [selectedTemplate, setSelectedTemplate] = useState('template1');
+    const [backgroundColor, setBackgroundColor] = useState('azul');
     const [form, setForm] = useState({
         nome: "",
         email: "",
@@ -63,11 +66,15 @@ function CriarCurriculo() {
             // Preparar dados do currículo
             const dadosCurriculo = {
                 ...form,
-                foto: foto // incluir a foto
+                foto: selectedTemplate === 'template2' ? foto : null // só incluir foto no template2
             };
             
-            // Gerar e fazer download do PDF
-            downloadPDFCurriculo(dadosCurriculo, "curriculo.pdf");
+            // Gerar e fazer download do PDF baseado no template selecionado
+            if (selectedTemplate === 'template1') {
+                downloadTemplate1(dadosCurriculo, "curriculo.pdf");
+            } else if (selectedTemplate === 'template2') {
+                await downloadTemplate2(dadosCurriculo, "curriculo.pdf", backgroundColor);
+            }
             
             // Mostrar opções de salvar se usuário estiver logado
             if (auth.currentUser) {
@@ -91,10 +98,12 @@ function CriarCurriculo() {
             setSaving(true);
             setSaveMessage("Salvando currículo...");
             
-            // Preparar dados do currículo incluindo a foto
+            // Preparar dados do currículo incluindo a foto e informações do template
             const dadosCurriculo = {
                 ...form,
-                foto: foto // incluir a foto base64
+                foto: selectedTemplate === 'template2' ? foto : null, // só incluir foto no template2
+                template: selectedTemplate,
+                backgroundColor: selectedTemplate === 'template2' ? backgroundColor : null
             };
             
             await salvarCurriculo(dadosCurriculo, auth.currentUser.uid);
@@ -121,6 +130,89 @@ function CriarCurriculo() {
 
     return (
         <div className="home-container">
+            <div className="template-selection">
+                <h2>Selecione um Modelo de Currículo</h2>
+                <div className="template-options">
+                    <div className={`template-option ${selectedTemplate === 'template1' ? 'selected' : ''}`}>
+                        <input
+                            type="radio"
+                            id="template1"
+                            name="template"
+                            value="template1"
+                            checked={selectedTemplate === 'template1'}
+                            onChange={(e) => setSelectedTemplate(e.target.value)}
+                        />
+                        <label htmlFor="template1">
+                            <div className="template-preview template1-preview">
+                                <h3>Template Clássico</h3>
+                                <p>Layout tradicional e profissional</p>
+                                <span className="template-features">✓ Sem foto</span>
+                            </div>
+                        </label>
+                    </div>
+                    
+                    <div className={`template-option ${selectedTemplate === 'template2' ? 'selected' : ''}`}>
+                        <input
+                            type="radio"
+                            id="template2"
+                            name="template"
+                            value="template2"
+                            checked={selectedTemplate === 'template2'}
+                            onChange={(e) => setSelectedTemplate(e.target.value)}
+                        />
+                        <label htmlFor="template2">
+                            <div className="template-preview template2-preview">
+                                <h3>Template Moderno</h3>
+                                <p>Layout com foto e cores personalizáveis</p>
+                                <span className="template-features">✓ Com foto</span>
+                                <span className="template-features">✓ Cores personalizáveis</span>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+                
+                {selectedTemplate === 'template2' && (
+                    <div className="color-selection">
+                        <h3>Escolha a cor de fundo:</h3>
+                        <div className="color-options">
+                            <label className={`color-option ${backgroundColor === 'azul' ? 'selected' : ''}`}>
+                                <input
+                                    type="radio"
+                                    name="backgroundColor"
+                                    value="azul"
+                                    checked={backgroundColor === 'azul'}
+                                    onChange={(e) => setBackgroundColor(e.target.value)}
+                                />
+                                <span className="color-preview azul"></span>
+                                <span>Azul</span>
+                            </label>
+                            <label className={`color-option ${backgroundColor === 'verde' ? 'selected' : ''}`}>
+                                <input
+                                    type="radio"
+                                    name="backgroundColor"
+                                    value="verde"
+                                    checked={backgroundColor === 'verde'}
+                                    onChange={(e) => setBackgroundColor(e.target.value)}
+                                />
+                                <span className="color-preview verde"></span>
+                                <span>Verde</span>
+                            </label>
+                            <label className={`color-option ${backgroundColor === 'vermelho' ? 'selected' : ''}`}>
+                                <input
+                                    type="radio"
+                                    name="backgroundColor"
+                                    value="vermelho"
+                                    checked={backgroundColor === 'vermelho'}
+                                    onChange={(e) => setBackgroundColor(e.target.value)}
+                                />
+                                <span className="color-preview vermelho"></span>
+                                <span>Vermelho</span>
+                            </label>
+                        </div>
+                    </div>
+                )}
+            </div>
+            
             <button 
                 onClick={() => setIsFormEnabled(!isFormEnabled)}
                 style={{
@@ -143,31 +235,33 @@ function CriarCurriculo() {
                     transition: "all 0.3s ease"
                 }}
             >
-                <label style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-                    Foto (opcional):
-                    <input
-                        type="file"
-                        accept="image/*"
-                        onChange={handleFotoChange}
-                        disabled={!isFormEnabled}
-                        ref={fileInputRef}
-                        style={{ margin: "10px 0" }}
-                    />
-                    {fotoPreview && (
-                        <img
-                            src={fotoPreview}
-                            alt="Preview"
-                            style={{
-                                width: 100,
-                                height: 100,
-                                objectFit: "cover",
-                                borderRadius: "50%",
-                                border: "3px solid #667eea",
-                                marginBottom: 10
-                            }}
+                {selectedTemplate === 'template2' && (
+                    <label style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+                        Foto (opcional):
+                        <input
+                            type="file"
+                            accept="image/*"
+                            onChange={handleFotoChange}
+                            disabled={!isFormEnabled}
+                            ref={fileInputRef}
+                            style={{ margin: "10px 0" }}
                         />
-                    )}
-                </label>
+                        {fotoPreview && (
+                            <img
+                                src={fotoPreview}
+                                alt="Preview"
+                                style={{
+                                    width: 100,
+                                    height: 100,
+                                    objectFit: "cover",
+                                    borderRadius: "50%",
+                                    border: "3px solid #667eea",
+                                    marginBottom: 10
+                                }}
+                            />
+                        )}
+                    </label>
+                )}
                 <label>
                     Nome:
                     <input name="nome" value={form.nome} onChange={handleChange} disabled={!isFormEnabled} required />

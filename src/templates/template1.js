@@ -7,65 +7,68 @@ import jsPDF from "jspdf";
  */
 export const gerarPDFCurriculo = (dadosCurriculo) => {
     const doc = new jsPDF();
-    let y = 15;
-    const marginLeft = 15;
-    const lineHeight = 6;
-    const sectionSpacing = 7;
-
-    // Foto (se houver)
-    if (dadosCurriculo.foto) {
-        const imgSize = 40;
-        const xCenter = (210 - imgSize) / 2; // Centralizar horizontalmente
-        // Desenhar círculo branco para "máscara"
-        doc.setFillColor(255, 255, 255);
-        doc.circle(105, y + imgSize / 2, imgSize / 2 + 2, 'F');
-        // Adicionar imagem
-        doc.addImage(dadosCurriculo.foto, 'JPEG', xCenter, y, imgSize, imgSize, undefined, 'FAST');
-        y += imgSize + 10; // Mais espaço após a foto
-    }
-
-    // Nome
-    doc.setFontSize(22);
-    doc.setFont("helvetica", "bold");
-    doc.text(dadosCurriculo.nome, 105, y, { align: "center" });
-    y += 15;
-    // Linha divisória
-    doc.setDrawColor(200, 200, 200);
-    doc.line(marginLeft, y, 200 - marginLeft, y);
-    y += sectionSpacing;
-
-    // Contato
-    doc.setFontSize(12);
-    doc.setFont("helvetica", "bold");
-    doc.text("Contato:", marginLeft, y);
-    doc.setFont("helvetica", "normal");
-    doc.text(`Email: ${dadosCurriculo.email} | Telefone: ${dadosCurriculo.telefone}`, marginLeft + 25, y);
-    y += lineHeight;
     
-    // Endereço
+    // ===== CONFIGURAÇÕES DE LAYOUT =====
+    const layoutConfig = {
+        // Margens e espaçamentos
+        marginLeft: 15,
+        marginRight: 15,
+        pageWidth: 210,
+        
+        // Alturas e espaçamentos
+        lineHeight: 6,
+        sectionSpacing: 7,
+        titleSpacing: 15,
+        smallSpacing: 5,
+        
+        // Posições iniciais
+        startY: 15,
+        
+        // Tamanhos de fonte
+        titleFontSize: 22,
+        sectionTitleFontSize: 12,
+        normalFontSize: 10
+    };
+    
+    // ===== VARIÁVEIS DE POSIÇÃO =====
+    let currentY = layoutConfig.startY;
+
+
+
+    // ===== SEÇÃO: NOME =====
+    doc.setFontSize(layoutConfig.titleFontSize);
     doc.setFont("helvetica", "bold");
-    doc.text("Endereço:", marginLeft, y);
+    doc.text(dadosCurriculo.nome, 105, currentY, { align: "center" });
+    currentY += layoutConfig.titleSpacing;
+    
+    currentY += layoutConfig.sectionSpacing;
+
+    // ===== SEÇÃO: CONTATO =====
+    doc.setFontSize(layoutConfig.sectionTitleFontSize);
+    doc.setFont("helvetica", "bold");
+    doc.text("Contato:", layoutConfig.marginLeft, currentY);
+    doc.setFont("helvetica", "normal");
+    doc.text(`Email: ${dadosCurriculo.email} | Telefone: ${dadosCurriculo.telefone}`, layoutConfig.marginLeft + 25, currentY);
+    currentY += layoutConfig.lineHeight;
+    
+    // ===== SEÇÃO: ENDEREÇO =====
+    doc.setFont("helvetica", "bold");
+    doc.text("Endereço:", layoutConfig.marginLeft, currentY);
     doc.setFont("helvetica", "normal");
     const endereco = `${dadosCurriculo.rua}, ${dadosCurriculo.numero} - ${dadosCurriculo.cidade} - ${dadosCurriculo.estado}`;
-    doc.text(endereco, marginLeft + 25, y);
-    y += sectionSpacing;
-    // Linha divisória
-    doc.line(marginLeft, y, 200 - marginLeft, y);
-    y += sectionSpacing;
+    doc.text(endereco, layoutConfig.marginLeft + 25, currentY);
+    currentY += layoutConfig.sectionSpacing;
 
-    // Resumo
+    // ===== SEÇÃO: RESUMO =====
     doc.setFont("helvetica", "bold");
-    doc.text("Resumo Profissional:", marginLeft, y);
-    y += lineHeight;
+    doc.text("Resumo Profissional:", layoutConfig.marginLeft, currentY);
+    currentY += layoutConfig.lineHeight;
     doc.setFont("helvetica", "normal");
-    const resumoLines = doc.splitTextToSize(dadosCurriculo.resumo, 180);
-    doc.text(resumoLines, marginLeft, y);
-    y += (resumoLines.length * lineHeight);
-    // Linha divisória
-    doc.line(marginLeft, y, 200 - marginLeft, y);
-    y += sectionSpacing;
+    const resumoLines = doc.splitTextToSize(dadosCurriculo.resumo, layoutConfig.pageWidth - layoutConfig.marginLeft - layoutConfig.marginRight);
+    doc.text(resumoLines, layoutConfig.marginLeft, currentY);
+    currentY += (resumoLines.length * layoutConfig.lineHeight) + layoutConfig.sectionSpacing;
 
-    // Habilidades
+    // ===== SEÇÃO: HABILIDADES =====
     const tecnicas = dadosCurriculo.habilidadesTecnicas ? 
         dadosCurriculo.habilidadesTecnicas.split(',').map(s => s.trim()).filter(s => s) : [];
     const pessoais = dadosCurriculo.habilidadesPessoais ? 
@@ -73,37 +76,34 @@ export const gerarPDFCurriculo = (dadosCurriculo) => {
 
     if (tecnicas.length > 0 || pessoais.length > 0) {
         doc.setFont("helvetica", "bold");
-        doc.text("Habilidades", marginLeft, y);
-        y += lineHeight;
+        doc.text("Habilidades", layoutConfig.marginLeft, currentY);
+        currentY += layoutConfig.lineHeight;
 
         if (tecnicas.length > 0) {
             doc.setFont("helvetica", "bold");
-            doc.text("Técnicas:", marginLeft, y);
+            doc.text("Técnicas:", layoutConfig.marginLeft, currentY);
             doc.setFont("helvetica", "normal");
-            const skillsLines = doc.splitTextToSize(tecnicas.join(' • '), 170);
-            doc.text(skillsLines, marginLeft + 25, y);
-            y += (skillsLines.length * lineHeight);
+            const skillsLines = doc.splitTextToSize(tecnicas.join(' • '), layoutConfig.pageWidth - layoutConfig.marginLeft - layoutConfig.marginRight - 10);
+            doc.text(skillsLines, layoutConfig.marginLeft + 25, currentY);
+            currentY += (skillsLines.length * layoutConfig.lineHeight);
         }
 
         if (pessoais.length > 0) {
             doc.setFont("helvetica", "bold");
-            doc.text("Pessoais:", marginLeft, y);
+            doc.text("Pessoais:", layoutConfig.marginLeft, currentY);
             doc.setFont("helvetica", "normal");
-            const skillsLines = doc.splitTextToSize(pessoais.join(' • '), 170);
-            doc.text(skillsLines, marginLeft + 25, y);
-            y += (skillsLines.length * lineHeight);
+            const skillsLines = doc.splitTextToSize(pessoais.join(' • '), layoutConfig.pageWidth - layoutConfig.marginLeft - layoutConfig.marginRight - 10);
+            doc.text(skillsLines, layoutConfig.marginLeft + 25, currentY);
+            currentY += (skillsLines.length * layoutConfig.lineHeight);
         }
 
-        y += 5;
-        // Linha divisória
-        doc.line(marginLeft, y, 200 - marginLeft, y);
-        y += sectionSpacing;
+        currentY += layoutConfig.sectionSpacing;
     }
 
-    // Formação Acadêmica
+    // ===== SEÇÃO: FORMAÇÃO ACADÊMICA =====
     doc.setFont("helvetica", "bold");
-    doc.text("Formação Acadêmica:", marginLeft, y);
-    y += lineHeight;
+    doc.text("Formação Acadêmica:", layoutConfig.marginLeft, currentY);
+    currentY += layoutConfig.lineHeight;
     doc.setFont("helvetica", "normal");
     const formacaoText = [
         `Curso: ${dadosCurriculo.formacaoCurso}`,
@@ -118,21 +118,18 @@ export const gerarPDFCurriculo = (dadosCurriculo) => {
     
     formacaoText.forEach(line => {
         if (line.trim()) {
-            const wrappedLines = doc.splitTextToSize(line, 180);
-            doc.text(wrappedLines, marginLeft, y);
-            y += (wrappedLines.length * lineHeight);
+            const wrappedLines = doc.splitTextToSize(line, layoutConfig.pageWidth - layoutConfig.marginLeft - layoutConfig.marginRight);
+            doc.text(wrappedLines, layoutConfig.marginLeft, currentY);
+            currentY += (wrappedLines.length * layoutConfig.lineHeight);
         }
     });
-    y += 5;
-    // Linha divisória
-    doc.line(marginLeft, y, 200 - marginLeft, y);
-    y += sectionSpacing;
+    currentY += layoutConfig.sectionSpacing;
 
-    // Experiência Profissional 
+    // ===== SEÇÃO: EXPERIÊNCIA PROFISSIONAL =====
     if (!dadosCurriculo.semExperiencia) {
         doc.setFont("helvetica", "bold");
-        doc.text("Experiência Profissional:", marginLeft, y);
-        y += lineHeight;
+        doc.text("Experiência Profissional:", layoutConfig.marginLeft, currentY);
+        currentY += layoutConfig.lineHeight;
         doc.setFont("helvetica", "normal");
         const expTermino = dadosCurriculo.expAtual ? "Atualmente" : dadosCurriculo.expTermino;
         const experienciaText = [
@@ -143,9 +140,9 @@ export const gerarPDFCurriculo = (dadosCurriculo) => {
         ];
         experienciaText.forEach(line => {
             if (line.trim()) {
-                const wrappedLines = doc.splitTextToSize(line, 180);
-                doc.text(wrappedLines, marginLeft, y);
-                y += (wrappedLines.length * lineHeight);
+                const wrappedLines = doc.splitTextToSize(line, layoutConfig.pageWidth - layoutConfig.marginLeft - layoutConfig.marginRight);
+                doc.text(wrappedLines, layoutConfig.marginLeft, currentY);
+                currentY += (wrappedLines.length * layoutConfig.lineHeight);
             }
         });
     }
