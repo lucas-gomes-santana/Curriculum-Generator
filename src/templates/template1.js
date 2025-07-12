@@ -1,6 +1,26 @@
 import jsPDF from "jspdf";
 
 /**
+ * Formata uma data do formato YYYY-MM para MM/YYYY (formato brasileiro)
+ * @param {string} dateString - Data no formato YYYY-MM
+ * @returns {string} Data formatada como MM/YYYY
+ */
+const formatarDataBrasileira = (dateString) => {
+    if (!dateString) return '';
+    const [ano, mes] = dateString.split('-');
+    if (!ano || !mes) return '';
+    
+    // Mapear números dos meses para nomes abreviados
+    const meses = {
+        '01': 'Jan', '02': 'Fev', '03': 'Mar', '04': 'Abr',
+        '05': 'Mai', '06': 'Jun', '07': 'Jul', '08': 'Ago',
+        '09': 'Set', '10': 'Out', '11': 'Nov', '12': 'Dez'
+    };
+    
+    return `${meses[mes]}/${ano}`;
+};
+
+/**
  * Gera um PDF de currículo a partir dos dados fornecidos
  * @param {Object} dadosCurriculo - Objeto contendo todos os dados do currículo
  * @returns {jsPDF} Documento PDF gerado
@@ -108,7 +128,7 @@ export const gerarPDFCurriculo = (dadosCurriculo) => {
     const formacaoText = [
         `Curso: ${dadosCurriculo.formacaoCurso}`,
         `Instituição de Ensino: ${dadosCurriculo.formacaoInstituicao}`,
-        `${dadosCurriculo.formacaoInicio} - ${dadosCurriculo.formacaoTermino}`,
+        `${formatarDataBrasileira(dadosCurriculo.formacaoInicio)} - ${formatarDataBrasileira(dadosCurriculo.formacaoTermino)}`,
     ];
     
     // Adicionar descrição da formação se existir
@@ -131,11 +151,11 @@ export const gerarPDFCurriculo = (dadosCurriculo) => {
         doc.text("Experiência Profissional:", layoutConfig.marginLeft, currentY);
         currentY += layoutConfig.lineHeight;
         doc.setFont("helvetica", "normal");
-        const expTermino = dadosCurriculo.expAtual ? "Atualmente" : dadosCurriculo.expTermino;
+        const expTermino = dadosCurriculo.expAtual ? "Atualmente" : formatarDataBrasileira(dadosCurriculo.expTermino);
         const experienciaText = [
             `Cargo: ${dadosCurriculo.expCargo}`,
             `Empresa: ${dadosCurriculo.expEmpresa}`,
-            `${dadosCurriculo.expInicio} - ${expTermino}`,
+            `${formatarDataBrasileira(dadosCurriculo.expInicio)} - ${expTermino}`,
             `${dadosCurriculo.expDescricao}`
         ];
         experienciaText.forEach(line => {

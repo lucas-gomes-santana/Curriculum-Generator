@@ -3,6 +3,10 @@ import { auth } from "../services/firebase";
 import { salvarCurriculo } from "../services/storage";
 import { downloadPDFCurriculo as downloadTemplate1 } from "../templates/template1";
 import { downloadPDFCurriculo as downloadTemplate2 } from "../templates/template2";
+import TemplateSelector from "../components/TemplateSelector";
+import EstadoSelector from "../components/EstadoSelector";
+import DateSelector from "../components/DateSelector";
+import PhoneSelector from "../components/PhoneSelector";
 import "../styles/CriarCurriculo.css";
 
 function CriarCurriculo() {
@@ -37,6 +41,7 @@ function CriarCurriculo() {
     const [showSaveOptions, setShowSaveOptions] = useState(false);
     const [saving, setSaving] = useState(false);
     const [saveMessage, setSaveMessage] = useState("");
+    const [validationErrors, setValidationErrors] = useState({});
     const fileInputRef = useRef();
 
     const handleChange = (e) => {
@@ -45,6 +50,23 @@ function CriarCurriculo() {
             ...form,
             [name]: type === "checkbox" ? checked : value
         });
+
+        // Limpar erros de validação de datas quando as datas são alteradas
+        if (name === 'formacaoInicio' || name === 'formacaoTermino') {
+            setValidationErrors(prev => {
+                const newErrors = { ...prev };
+                delete newErrors.formacaoDates;
+                return newErrors;
+            });
+        }
+        
+        if (name === 'expInicio' || name === 'expTermino') {
+            setValidationErrors(prev => {
+                const newErrors = { ...prev };
+                delete newErrors.expDates;
+                return newErrors;
+            });
+        }
     };
 
     const handleFotoChange = (e) => {
@@ -61,6 +83,16 @@ function CriarCurriculo() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        
+        // Validar datas antes de prosseguir
+        const dateErrors = validateDates();
+        const allErrors = { ...validationErrors, ...dateErrors };
+        
+        if (Object.keys(allErrors).length > 0) {
+            setValidationErrors(allErrors);
+            alert('Por favor, corrija os erros de validação antes de gerar o currículo.');
+            return;
+        }
         
         try {
             // Preparar dados do currículo
@@ -128,90 +160,54 @@ function CriarCurriculo() {
         setSaveMessage("");
     };
 
+    // Função para lidar com erros de validação dos DateSelectors
+    const handleValidationError = (fieldName, error) => {
+        setValidationErrors(prev => {
+            const newErrors = { ...prev };
+            if (error) {
+                newErrors[fieldName] = error;
+            } else {
+                delete newErrors[fieldName];
+            }
+            return newErrors;
+        });
+    };
+
+    // Função para validar datas
+    const validateDates = () => {
+        const errors = {};
+
+        // Validar formação acadêmica
+        if (form.formacaoInicio && form.formacaoTermino) {
+            const inicio = new Date(form.formacaoInicio + '-01');
+            const termino = new Date(form.formacaoTermino + '-01');
+            
+            if (inicio > termino) {
+                errors.formacaoDates = 'A data de início da formação não pode ser posterior à data de término';
+            }
+        }
+
+        // Validar experiência profissional
+        if (!form.semExperiencia && form.expInicio && form.expTermino && !form.expAtual) {
+            const inicio = new Date(form.expInicio + '-01');
+            const termino = new Date(form.expTermino + '-01');
+            
+            if (inicio > termino) {
+                errors.expDates = 'A data de início da experiência não pode ser posterior à data de término';
+            }
+        }
+
+        return errors;
+    };
+
     return (
         <div className="home-container">
-            <div className="template-selection">
-                <h2>Selecione um Modelo de Currículo</h2>
-                <div className="template-options">
-                    <div className={`template-option ${selectedTemplate === 'template1' ? 'selected' : ''}`}>
-                        <input
-                            type="radio"
-                            id="template1"
-                            name="template"
-                            value="template1"
-                            checked={selectedTemplate === 'template1'}
-                            onChange={(e) => setSelectedTemplate(e.target.value)}
-                        />
-                        <label htmlFor="template1">
-                            <div className="template-preview template1-preview">
-                                <h3>Template Clássico</h3>
-                                <p>Layout tradicional e profissional</p>
-                                <span className="template-features">✓ Sem foto</span>
-                            </div>
-                        </label>
-                    </div>
-                    
-                    <div className={`template-option ${selectedTemplate === 'template2' ? 'selected' : ''}`}>
-                        <input
-                            type="radio"
-                            id="template2"
-                            name="template"
-                            value="template2"
-                            checked={selectedTemplate === 'template2'}
-                            onChange={(e) => setSelectedTemplate(e.target.value)}
-                        />
-                        <label htmlFor="template2">
-                            <div className="template-preview template2-preview">
-                                <h3>Template Moderno</h3>
-                                <p>Layout com foto e cores personalizáveis</p>
-                                <span className="template-features">✓ Com foto</span>
-                                <span className="template-features">✓ Cores personalizáveis</span>
-                            </div>
-                        </label>
-                    </div>
-                </div>
-                
-                {selectedTemplate === 'template2' && (
-                    <div className="color-selection">
-                        <h3>Escolha a cor de fundo:</h3>
-                        <div className="color-options">
-                            <label className={`color-option ${backgroundColor === 'azul' ? 'selected' : ''}`}>
-                                <input
-                                    type="radio"
-                                    name="backgroundColor"
-                                    value="azul"
-                                    checked={backgroundColor === 'azul'}
-                                    onChange={(e) => setBackgroundColor(e.target.value)}
-                                />
-                                <span className="color-preview azul"></span>
-                                <span>Azul</span>
-                            </label>
-                            <label className={`color-option ${backgroundColor === 'verde' ? 'selected' : ''}`}>
-                                <input
-                                    type="radio"
-                                    name="backgroundColor"
-                                    value="verde"
-                                    checked={backgroundColor === 'verde'}
-                                    onChange={(e) => setBackgroundColor(e.target.value)}
-                                />
-                                <span className="color-preview verde"></span>
-                                <span>Verde</span>
-                            </label>
-                            <label className={`color-option ${backgroundColor === 'vermelho' ? 'selected' : ''}`}>
-                                <input
-                                    type="radio"
-                                    name="backgroundColor"
-                                    value="vermelho"
-                                    checked={backgroundColor === 'vermelho'}
-                                    onChange={(e) => setBackgroundColor(e.target.value)}
-                                />
-                                <span className="color-preview vermelho"></span>
-                                <span>Vermelho</span>
-                            </label>
-                        </div>
-                    </div>
-                )}
-            </div>
+            <TemplateSelector
+                selectedTemplate={selectedTemplate}
+                setSelectedTemplate={setSelectedTemplate}
+                backgroundColor={backgroundColor}
+                setBackgroundColor={setBackgroundColor}
+            />
             
             <button 
                 onClick={() => setIsFormEnabled(!isFormEnabled)}
@@ -270,10 +266,12 @@ function CriarCurriculo() {
                     Email:
                     <input name="email" type="email" value={form.email} onChange={handleChange} disabled={!isFormEnabled} required />
                 </label>
-                <label>
-                    Telefone:
-                    <input name="telefone" value={form.telefone} onChange={handleChange} disabled={!isFormEnabled} required />
-                </label>
+                <PhoneSelector
+                    value={form.telefone}
+                    onChange={handleChange}
+                    disabled={!isFormEnabled}
+                    required
+                />
                 <label>
                     Rua:
                     <input name="rua" value={form.rua} onChange={handleChange} disabled={!isFormEnabled} required />
@@ -286,10 +284,12 @@ function CriarCurriculo() {
                     Cidade:
                     <input name="cidade" value={form.cidade} onChange={handleChange} disabled={!isFormEnabled} required />
                 </label>
-                <label>
-                    Estado:
-                    <input name="estado" value={form.estado} onChange={handleChange} disabled={!isFormEnabled} required />
-                </label>
+                <EstadoSelector
+                    value={form.estado}
+                    onChange={handleChange}
+                    disabled={!isFormEnabled}
+                    required
+                />
                 <label>
                     Resumo:
                     <textarea name="resumo" value={form.resumo} onChange={handleChange} disabled={!isFormEnabled} required />
@@ -315,14 +315,29 @@ function CriarCurriculo() {
                         Curso:
                         <input name="formacaoCurso" value={form.formacaoCurso} onChange={handleChange} disabled={!isFormEnabled} required />
                     </label>
-                    <label>
-                        Data de início:
-                        <input name="formacaoInicio" type="month" value={form.formacaoInicio} onChange={handleChange} disabled={!isFormEnabled} required />
-                    </label>
-                    <label>
-                        Data de término:
-                        <input name="formacaoTermino" type="month" value={form.formacaoTermino} onChange={handleChange} disabled={!isFormEnabled} required />
-                    </label>
+                    <DateSelector
+                        name="formacaoInicio"
+                        value={form.formacaoInicio}
+                        onChange={handleChange}
+                        disabled={!isFormEnabled}
+                        required
+                        label="Data de início"
+                        onValidationError={handleValidationError}
+                    />
+                    <DateSelector
+                        name="formacaoTermino"
+                        value={form.formacaoTermino}
+                        onChange={handleChange}
+                        disabled={!isFormEnabled}
+                        required
+                        label="Data de término"
+                        onValidationError={handleValidationError}
+                    />
+                    {validationErrors.formacaoDates && (
+                        <div className="error-message" style={{ color: '#dc3545', fontSize: '14px', marginTop: '10px' }}>
+                            {validationErrors.formacaoDates}
+                        </div>
+                    )}
                 </fieldset>
                 <fieldset>
                     <legend>Experiência Profissional</legend>
@@ -339,14 +354,24 @@ function CriarCurriculo() {
                                 Cargo:
                                 <input name="expCargo" value={form.expCargo} onChange={handleChange} disabled={!isFormEnabled} required={!form.semExperiencia} />
                             </label>
-                            <label>
-                                Data de início:
-                                <input name="expInicio" type="month" value={form.expInicio} onChange={handleChange} disabled={!isFormEnabled} required={!form.semExperiencia} />
-                            </label>
-                            <label>
-                                Data de término:
-                                <input name="expTermino" type="month" value={form.expTermino} onChange={handleChange} disabled={!isFormEnabled || form.expAtual} required={!form.expAtual && !form.semExperiencia} />
-                            </label>
+                            <DateSelector
+                                name="expInicio"
+                                value={form.expInicio}
+                                onChange={handleChange}
+                                disabled={!isFormEnabled}
+                                required={!form.semExperiencia}
+                                label="Data de início"
+                                onValidationError={handleValidationError}
+                            />
+                            <DateSelector
+                                name="expTermino"
+                                value={form.expTermino}
+                                onChange={handleChange}
+                                disabled={!isFormEnabled || form.expAtual}
+                                required={!form.expAtual && !form.semExperiencia}
+                                label="Data de término"
+                                onValidationError={handleValidationError}
+                            />
                             <label>
                                 <input type="checkbox" name="expAtual" checked={form.expAtual} onChange={handleChange} disabled={!isFormEnabled} /> Atualmente trabalho aqui
                             </label>
@@ -354,6 +379,11 @@ function CriarCurriculo() {
                                 Descrição das atividades:
                                 <textarea name="expDescricao" value={form.expDescricao} onChange={handleChange} disabled={!isFormEnabled} />
                             </label>
+                            {validationErrors.expDates && (
+                                <div className="error-message" style={{ color: '#dc3545', fontSize: '14px', marginTop: '10px' }}>
+                                    {validationErrors.expDates}
+                                </div>
+                            )}
                         </>
                     )}
                 </fieldset>

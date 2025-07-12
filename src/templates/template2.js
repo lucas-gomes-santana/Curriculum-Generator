@@ -1,6 +1,26 @@
 import jsPDF from "jspdf";
 
 /**
+ * Formata uma data do formato YYYY-MM para MM/YYYY (formato brasileiro)
+ * @param {string} dateString - Data no formato YYYY-MM
+ * @returns {string} Data formatada como MM/YYYY
+ */
+const formatarDataBrasileira = (dateString) => {
+    if (!dateString) return '';
+    const [ano, mes] = dateString.split('-');
+    if (!ano || !mes) return '';
+    
+    // Mapear números dos meses para nomes abreviados
+    const meses = {
+        '01': 'Jan', '02': 'Fev', '03': 'Mar', '04': 'Abr',
+        '05': 'Mai', '06': 'Jun', '07': 'Jul', '08': 'Ago',
+        '09': 'Set', '10': 'Out', '11': 'Nov', '12': 'Dez'
+    };
+    
+    return `${meses[mes]}/${ano}`;
+};
+
+/**
  * Recorta uma imagem para formato circular com fundo transparente e alta resolução
  * @param {string} imageData - Base64 da imagem
  * @param {number} size - Tamanho da imagem final
@@ -282,7 +302,7 @@ export const gerarPDFCurriculo = async (dadosCurriculo, backgroundColor = 'azul'
         mainY += layoutConfig.lineHeight;
         doc.text(`Instituição: ${dadosCurriculo.formacaoInstituicao || 'Não informada'}`, layoutConfig.mainMarginLeft, mainY);
         mainY += layoutConfig.lineHeight;
-        doc.text(`Período: ${dadosCurriculo.formacaoInicio || ''} - ${dadosCurriculo.formacaoTermino || ''}`, layoutConfig.mainMarginLeft, mainY);
+                    doc.text(`Período: ${formatarDataBrasileira(dadosCurriculo.formacaoInicio)} - ${formatarDataBrasileira(dadosCurriculo.formacaoTermino)}`, layoutConfig.mainMarginLeft, mainY);
         mainY += layoutConfig.lineHeight;
         
         if (dadosCurriculo.formacaoDescricao) {
@@ -306,8 +326,8 @@ export const gerarPDFCurriculo = async (dadosCurriculo, backgroundColor = 'azul'
         mainY += layoutConfig.lineHeight;
         doc.text(`Empresa: ${dadosCurriculo.expEmpresa || 'Não informada'}`, layoutConfig.mainMarginLeft, mainY);
         mainY += layoutConfig.lineHeight;
-        const expTermino = dadosCurriculo.expAtual ? 'Atualmente' : dadosCurriculo.expTermino;
-        doc.text(`Período: ${dadosCurriculo.expInicio || ''} - ${expTermino || ''}`, layoutConfig.mainMarginLeft, mainY);
+        const expTermino = dadosCurriculo.expAtual ? 'Atualmente' : formatarDataBrasileira(dadosCurriculo.expTermino);
+        doc.text(`Período: ${formatarDataBrasileira(dadosCurriculo.expInicio)} - ${expTermino}`, layoutConfig.mainMarginLeft, mainY);
         mainY += layoutConfig.lineHeight;
         
         if (dadosCurriculo.expDescricao) {

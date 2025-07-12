@@ -8,7 +8,8 @@ import {
   deleteDoc,
   doc 
 } from 'firebase/firestore';
-import { downloadPDFCurriculo } from '../templates/template1';
+import { downloadPDFCurriculo as downloadTemplate1 } from '../templates/template1';
+import { downloadPDFCurriculo as downloadTemplate2 } from '../templates/template2';
 
 // Salvar currículo no Firestore
 export const salvarCurriculo = async (dadosCurriculo, userId) => {
@@ -21,7 +22,6 @@ export const salvarCurriculo = async (dadosCurriculo, userId) => {
       telefone: dadosCurriculo.telefone,
       cidade: dadosCurriculo.cidade,
       estado: dadosCurriculo.estado,
-      cep: dadosCurriculo.cep,
       rua: dadosCurriculo.rua,
       numero: dadosCurriculo.numero,
       resumo: dadosCurriculo.resumo,
@@ -37,6 +37,8 @@ export const salvarCurriculo = async (dadosCurriculo, userId) => {
       expDescricao: dadosCurriculo.expDescricao,
       semExperiencia: dadosCurriculo.semExperiencia,
       foto: dadosCurriculo.foto, // base64 da foto
+      template: dadosCurriculo.template || 'template1',
+      backgroundColor: dadosCurriculo.backgroundColor || null,
       dataCriacao: new Date()
     };
     
@@ -97,13 +99,17 @@ export const deletarCurriculo = async (curriculoId) => {
   }
 };
 
-
-
 // Download do PDF gerado a partir dos dados
 export const downloadCurriculo = async (curriculoData) => {
   try {
     const fileName = `curriculo_${curriculoData.nome.replace(/\s+/g, '_')}_${Date.now()}.pdf`;
-    downloadPDFCurriculo(curriculoData, fileName);
+    const template = curriculoData.template || 'template1';
+    if (template === 'template2') {
+      const backgroundColor = curriculoData.backgroundColor || 'azul';
+      await downloadTemplate2(curriculoData, fileName, backgroundColor);
+    } else {
+      downloadTemplate1(curriculoData, fileName);
+    }
   } catch (error) {
     console.error('Erro ao fazer download:', error);
     throw error;

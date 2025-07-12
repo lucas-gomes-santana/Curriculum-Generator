@@ -1,0 +1,102 @@
+/* Estilos para o seletor de datas */
+.date-selector {
+    display: block;
+    margin-bottom: 20px;
+    font-weight: 600;
+    color: #333;
+    font-size: 16px;
+}
+
+.date-inputs {
+    display: flex;
+    gap: 10px;
+    margin-top: 5px;
+}
+
+.month-select {
+    flex: 1;
+    padding: 12px 15px;
+    border: 2px solid #e1e5e9;
+    border-radius: 10px;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    background: #f8f9fa;
+    box-sizing: border-box;
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 15px center;
+    background-size: 16px;
+    padding-right: 45px;
+}
+
+.year-input {
+    flex: 1;
+    padding: 12px 15px;
+    border: 2px solid #e1e5e9;
+    border-radius: 10px;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    background: #f8f9fa;
+    box-sizing: border-box;
+    text-align: center;
+}
+
+.month-select:focus,
+.year-input:focus {
+    outline: none;
+    border-color: #667eea;
+    background-color: white;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.month-select:disabled,
+.year-input:disabled {
+    background-color: #f5f5f5;
+    color: #999;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.month-select option {
+    padding: 8px;
+    background: white;
+    color: #333;
+}
+
+.month-select option:hover {
+    background: #f8f9fa;
+}
+
+/* Estilo para o placeholder */
+.month-select option[value=""] {
+    color: #999;
+    font-style: italic;
+}
+
+/* Estilos para erro */
+.year-input.error {
+    border-color: #dc3545;
+    background-color: #fff5f5;
+}
+
+.error-message {
+    color: #dc3545;
+    font-size: 12px;
+    margin-top: 5px;
+    font-weight: 500;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .date-inputs {
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .month-select,
+    .year-input {
+        width: 100%;
+    }
+} 
