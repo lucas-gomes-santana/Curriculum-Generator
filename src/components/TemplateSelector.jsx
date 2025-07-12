@@ -25,7 +25,7 @@ function TemplateSelector({
                             <h3>Modelo Clássico</h3>
                             <p>Layout tradicional e profissional</p>
                             <span className="template-benefits">✓ Gratuito</span>
-                            <span className="template-disvantages">Sem foto</span>
+                            <span className="template-disvantages">❌ Sem foto</span>
                         </div>
                     </label>
                 </div>
