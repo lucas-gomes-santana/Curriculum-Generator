@@ -6,12 +6,12 @@ Este repositório consiste em uma aplicação web que gera currículos com base 
 
 ### Tecnologias Utilizadas
 
-- React: Front-End e interfaces do App;
+- Front-end: ReactJs e CSS
 
-- Firebase: Back-End do App feito de forma On-line com uso para login e autenticação de usuários com uso do provedor do Google;
+- Back-end: Firebase Studio
 
 ***
 
 ### Objetivos do Projeto
 
-Se tornar um futuro Micro-Sass, com objetivo de uso comercial e lucro.
+Simular uma aplicação micro-saas desenvolvendo um projeto que atenda a uma necessidade real das pessoas
