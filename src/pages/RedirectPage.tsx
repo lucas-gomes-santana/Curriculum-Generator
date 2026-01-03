@@ -17,7 +17,7 @@ function Redirect() {
         </p>
 
         <a
-          href="#"
+          href="https://curriculum-generator-saas-version.vercel.app/"
           className="farewell-button"
           target="_blank"
           rel="noopener noreferrer"
