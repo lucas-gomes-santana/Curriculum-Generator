@@ -1,7 +1,3 @@
-import Login from './Login';
-import CriarCurriculo from './CriarCurriculo';
-import MeusCurriculos from './MeusCurriculos';
-import Navigation from '../components/Navigation';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Redirect from './RedirectPage';
 
